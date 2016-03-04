@@ -1,0 +1,47 @@
+%YAML1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: M3U8
+
+file_extensions:
+  - m3u8
+  - m3u
+
+scope: source.m3u8
+
+first_line_match: ^\#EXTM3U
+
+contexts:
+  main:
+
+    - match: \#EXT-X-CUE-OUT
+      push: cue_out
+
+    - match: \#EXT-X-DISCONTINUITY
+      scope: entity.other.attribute-name.m3u8
+
+    - match: \#EXTINF
+      scope: constant.numeric.m3u8
+
+    - match: '#'
+      push: tag_line
+
+  cue_out:
+    - meta_scope: entity.name.tag.m3u8
+    - match: ':'
+      pop: true
+
+  tag_line:
+    - meta_scope: comment.m3u8
+    - match: '"'
+      push: double_quoted_string
+    - match: $
+      pop: true
+
+  double_quoted_string:
+    - meta_scope: string.quoted.double.m3u8
+    - match: '\\.'
+      scope: constant.character.escape.m3u8
+    - match: '"|$'
+      scope: punctuation.definition.string.end.m3u8
+      pop: true
